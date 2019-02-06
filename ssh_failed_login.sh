@@ -7,7 +7,7 @@ PATH_SCRIPT=/home/gwen/ssh_failed_login
 source $PATH_SCRIPT/.env
 
 
-ATTEMPTS=$(grep -a -E 'invalid' /var/log/auth.log|grep -a -E "$(date +'%b %e')"|grep "preauth")
+ATTEMPTS=$(grep -a -E 'invalid|REFUSED' /var/log/auth.log|grep -a -E "$(date +'%b %e')"|grep "preauth")
 
 if [ "$ATTEMPTS" != "" ]; then
   ATTEMPTS_COUNT=$(echo "$ATTEMPTS"|wc -l)
