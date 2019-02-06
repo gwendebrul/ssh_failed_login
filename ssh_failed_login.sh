@@ -1,12 +1,21 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-source ./.env
+##### Add the absolute path to the ssh_failed_login folder
+PATH_SCRIPT=/home/gwen/ssh_failed_login
+#### End edit
 
-ATTEMPTS=$(grep -a -E 'invalid|REFUSED' /var/log/auth.log|grep -a -E "$(date +'%e')"|grep -a -E "preauth")
+source $PATH_SCRIPT/.env
 
-ATTEMPTS_COUNT=$(echo "$ATTEMPTS"|wc -l)
+
+ATTEMPTS=$(grep -a -E 'invalid' /var/log/auth.log|grep -a -E "$(date +'%b %e')"|grep "preauth")
+
+if [ "$ATTEMPTS" != "" ]; then
+  ATTEMPTS_COUNT=$(echo "$ATTEMPTS"|wc -l)
+else
+  ATTEMPTS_COUNT=0
+fi
 
 MESSAGE=$(echo -e "on $(date +'%B %e %Y') there were $ATTEMPTS_COUNT failed login attempts on $(hostname)")
 
-curl -X POST -H "Content-Type: application/json" -d "{\"value1\":\"$MESSAGE\"}" $IFTTT_FAILED_SSH
-#echo "{\"value1\":\"$MESSAGE\"}" $IFTTT_FAILED_SSH
+curl -S -s -X POST -H "Content-Type: application/json" -d "{\"value1\":\"$MESSAGE\"}" $IFTTT_FAILED_SSH >/dev/null 2>&1
+
